@@ -1,0 +1,1 @@
+-- Criar o esquema inicial do banco de dados.

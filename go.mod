@@ -1,8 +1,11 @@
-module gio.test
+module sentrypass
 
 go 1.24.1
 
-require gioui.org v0.8.0
+require (
+	gioui.org v0.8.0
+	github.com/mattn/go-sqlite3 v1.14.24
+)
 
 require (
 	gioui.org/shader v1.0.8 // indirect
