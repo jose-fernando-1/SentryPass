@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"sentrypass/database"
+	"sentrypass/logic/database"
 	/*
 		"os"
 		"image/color"
