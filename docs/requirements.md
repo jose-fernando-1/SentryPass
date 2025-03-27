@@ -63,7 +63,7 @@ SentryPass is a personal project developed in Go, focused on creating a secure, 
 | Code  | Description                                                                                      |
 |-------|--------------------------------------------------------------------------------------------------|
 | FR01  | Using Argon2 for key derivation and secure storage.                                |
-| FR02  | Each entry includes: title, username/email, password, URL (optional), notes (optional), and creation/update timestamps. All fields stored encrypted with AES-256.               |           |
+| FR02  | Each entry includes: title, username/email, password, URL (optional), details (optional), and creation/update timestamps. Only password and details stored encrypted with AES-256, so it is not needed to decrypt other fields when searching for an entry.              |           |
 | FR04  | Locally encrypted vault with strong encryption (AES-256 GCM). Encryption key derived from master password (Argon2). Vault file protected against tampering.                                                   |
 | FR05  | Strong password generator with the following features: Checkboxes for uppercase, lowercase and numbers. Dropdown for selecting password length (8 to 64 characters). Show password intensity. Textbox for custom special characters input. Buttons for peeking, regenerating and copying to clipboard. Presets: Default(strong) and Custom.    |
 | FR06  | Search by title or any of the optional fields words using a searchbox. Dropdown category selection for filtering (independent from string search).                                                             |
