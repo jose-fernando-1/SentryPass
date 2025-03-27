@@ -1,25 +1,43 @@
 -- Create initial schema.
 
-DROP TABLE IF EXISTS Entry;
+PRAGMA foreign_keys = ON;
 
-CREATE TABLE IF NOT EXISTS Entry (
-    id INTEGER PRIMARY KEY AUTOINCREMENT, -- Unique identifier for each entry
-    username TEXT NOT NULL,               -- Username or email
-    password TEXT NOT NULL,               -- Encrypted password
-    notes TEXT,                           -- Optional notes
-    date_of_creation DATETIME DEFAULT CURRENT_TIMESTAMP, -- Timestamp of creation
-    date_of_last_password_update DATETIME DEFAULT CURRENT_TIMESTAMP -- Timestamp of last update
+DROP TABLE IF EXISTS User;
+DROP TABLE IF EXISTS Logs;
+DROP TABLE IF EXISTS Categories;
+DROP TABLE IF EXISTS Entries;
+
+CREATE TABLE IF NOT EXISTS User (
+    id_user INTEGER PRIMARY KEY CHECK(id_user = 1),
+    master_password_hash TEXT NOT NULL,
+    master_password_salt TEXT NOT NULL,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
--- Timestamp is stored in UTC timezone for best practices.
--- On display to the user, it should be converted to the user's timezone.
+CREATE TABLE IF NOT EXISTS Logs(
+    id_log INTEGER PRIMARY KEY,
+    action TEXT NOT NULL,
+    timestamp TEXT DEFAULT CURRENT_TIMESTAMP,
+    id_user INTEGER NOT NULL,
+    FOREIGN KEY (id_user) REFERENCES User(id_user) ON DELETE CASCADE
+);
 
-CREATE TRIGGER update_date_of_last_password_update
-AFTER UPDATE OF password ON Entry
-FOR EACH ROW
-WHEN NEW.password != OLD.password
-BEGIN
-    UPDATE Entry
-    SET date_of_last_password_update = CURRENT_TIMESTAMP
-    WHERE id = OLD.id;
-END;
+CREATE TABLE IF NOT EXISTS Categories(
+    id_category INTEGER PRIMARY KEY,
+    type TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Entries(
+    id_entry INTEGER PRIMARY KEY,
+    title TEXT UNIQUE NOT NULL,
+    username TEXT NOT NULL,
+    password_encrypted TEXT NOT NULL,
+    url TEXT,
+    details_encrypted TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TEXT DEFAULT NULL,
+    id_category INTEGER NOT NULL,
+    id_user INTEGER NOT NULL,
+    FOREIGN KEY (id_user) REFERENCES User(id_user) ON DELETE CASCADE,
+    FOREIGN KEY (id_category) REFERENCES Categories(id_category) ON DELETE CASCADE
+);
