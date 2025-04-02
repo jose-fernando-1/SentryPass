@@ -1,11 +1,9 @@
 -- Create initial schema.
 
-PRAGMA foreign_keys = ON;
-
-DROP TABLE IF EXISTS User;
+DROP TABLE IF EXISTS Entries;
 DROP TABLE IF EXISTS Logs;
 DROP TABLE IF EXISTS Categories;
-DROP TABLE IF EXISTS Entries;
+DROP TABLE IF EXISTS User;
 
 CREATE TABLE IF NOT EXISTS User (
     id_user INTEGER PRIMARY KEY CHECK(id_user = 1),

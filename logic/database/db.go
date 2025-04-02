@@ -6,38 +6,50 @@ import (
 	"os"
 	"path/filepath"
 
-	_ "github.com/mattn/go-sqlite3" // Importa o driver SQLite
+	_ "github.com/mattn/go-sqlite3" // Importing SQLite driver
 )
 
-// Inicializa o banco de dados SQLite
+// Initializing SQLite database
 func InitDB() *sql.DB {
-	// Abre ou cria o arquivo do database
+	// Creating the database file if it doesn't exist
 	db, err := sql.Open("sqlite3", "sentrypass.db")
 	if err != nil {
-		log.Fatal("Erro ao abrir o banco de dados: ", err)
+		log.Fatal("Failed to open the database: ", err)
 	}
-	log.Println("Banco de dados conectado com sucesso.")
+
+	// Verify the database connection
+	err = db.Ping()
+	if err != nil {
+		log.Fatal("Failed to connect to the database: ", err)
+	}
+
+	// Enable foreign key constraints
+	_, err = db.Exec("PRAGMA foreign_keys = ON;")
+	if err != nil {
+		log.Fatal("Failed to enable foreign keys: ", err)
+	}
+
+	log.Println("Database connected and foreign keys enabled.")
 	return db
 }
 
-// Executa todas as migrações no folder migrations
 func RunMigrations(db *sql.DB) {
 	files, err := os.ReadDir("migrations")
 	if err != nil {
-		log.Fatal("Erro ao ler diretório migrations: ", err)
+		log.Fatal("Failed to read migrations directory: ", err)
 	}
 
 	for _, file := range files {
 		script, err := os.ReadFile(filepath.Join("migrations", file.Name()))
 		if err != nil {
-			log.Fatalf("Erro ao ler o arquivo %s: %v", file.Name(), err)
+			log.Fatalf("Failed to read file %s: %v", file.Name(), err)
 		}
 
 		_, err = db.Exec(string(script))
 		if err != nil {
-			log.Fatalf("Erro ao executar a migração %s: %v", file.Name(), err)
+			log.Fatalf("Failed to execute migration %s: %v", file.Name(), err)
 		}
 
-		log.Printf("Migração %s aplicada com sucesso.", file.Name())
+		log.Printf("Migration %s applied successfully.", file.Name())
 	}
 }

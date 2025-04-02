@@ -1,7 +1,7 @@
-UPDATE entry
-SET password = "new_encrypted_password_1"
-Where username = "user1@example.com";
+UPDATE Entries
+SET password_encrypted = 'new_encrypted_password_1'
+WHERE username = 'user1@example.com';
 
-UPDATE Entry
-SET password = "new_encrypted_password_2"
-Where username = "user2@example.com";
+UPDATE Entries
+SET password_encrypted = 'new_encrypted_password_2'
+WHERE username = 'user2@example.com';
