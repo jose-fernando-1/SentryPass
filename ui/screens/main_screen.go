@@ -2,6 +2,7 @@ package screens
 
 import (
 	"image/color"
+	"os"
 
 	"gioui.org/app"
 	"gioui.org/layout"
@@ -16,7 +17,10 @@ func Run_GUI(window *app.Window) error {
 	for {
 		switch e := window.Event().(type) {
 		case app.DestroyEvent:
-			return e.Err
+			if e.Err != nil {
+				return e.Err
+			}
+			os.Exit(0)
 		case app.FrameEvent:
 			// this graphics context is used for managing the rendering state.
 			gtx := app.NewContext(&ops, e)

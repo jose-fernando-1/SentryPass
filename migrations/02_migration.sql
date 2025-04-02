@@ -1,6 +1,6 @@
 INSERT INTO User (master_password_hash, master_password_salt)
 VALUES 
-    ('hashed_password_1', 'salt_1');
+    (?, ?);
 
 INSERT INTO Categories (type)
 VALUES 

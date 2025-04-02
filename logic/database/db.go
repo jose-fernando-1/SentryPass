@@ -6,13 +6,23 @@ import (
 	"os"
 	"path/filepath"
 
+	"sentrypass/logic/utils"
+
 	_ "github.com/mattn/go-sqlite3" // Importing SQLite driver
 )
 
-// Initializing SQLite database
-func InitDB() *sql.DB {
-	// Creating the database file if it doesn't exist
-	db, err := sql.Open("sqlite3", "sentrypass.db")
+// InitDB initializes the SQLite database at the specified path.
+func InitDB(dbPath string) *sql.DB {
+	// Ensure the directory exists
+	err := os.MkdirAll(filepath.Dir(dbPath), os.ModePerm)
+	if err != nil {
+		log.Fatalf("Failed to create database directory: %v", err)
+	}
+
+	log.Printf("Database path: %s", dbPath)
+
+	// Open the database file
+	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		log.Fatal("Failed to open the database: ", err)
 	}
@@ -33,23 +43,40 @@ func InitDB() *sql.DB {
 	return db
 }
 
-func RunMigrations(db *sql.DB) {
-	files, err := os.ReadDir("migrations")
+// RunSchemaMigration runs the schema initialization script.
+func RunSchemaMigration(db *sql.DB) {
+	scriptPath := filepath.Join("migrations", "01_schema.sql")
+	script, err := os.ReadFile(scriptPath)
 	if err != nil {
-		log.Fatal("Failed to read migrations directory: ", err)
+		log.Fatalf("Failed to read schema migration file: %v", err)
 	}
 
-	for _, file := range files {
-		script, err := os.ReadFile(filepath.Join("migrations", file.Name()))
-		if err != nil {
-			log.Fatalf("Failed to read file %s: %v", file.Name(), err)
-		}
-
-		_, err = db.Exec(string(script))
-		if err != nil {
-			log.Fatalf("Failed to execute migration %s: %v", file.Name(), err)
-		}
-
-		log.Printf("Migration %s applied successfully.", file.Name())
+	_, err = db.Exec(string(script))
+	if err != nil {
+		log.Fatalf("Failed to execute schema migration: %v", err)
 	}
+
+	log.Println("Schema migration applied successfully.")
+}
+
+// PopulateInitialData populates the database with initial data.
+func PopulateInitialData(db *sql.DB, masterPasswordHash, masterPasswordSalt string) {
+	scriptPath := filepath.Join("migrations", "02_migration.sql")
+	script, err := os.ReadFile(scriptPath)
+	if err != nil {
+		log.Fatalf("Failed to read data population file: %v", err)
+	}
+
+	// Split the script into individual SQL statements
+	statements := utils.SplitSQLStatements(string(script))
+
+	// Execute each statement
+	for _, stmt := range statements {
+		_, err := db.Exec(stmt, masterPasswordHash, masterPasswordSalt)
+		if err != nil {
+			log.Fatalf("Failed to execute data population statement: %v", err)
+		}
+	}
+
+	log.Println("Initial data populated successfully.")
 }
